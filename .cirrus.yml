@@ -22,7 +22,9 @@ env:
     #CONFIG: config.sh
 
     # Cirrus Specific Vars (Do *NOT* Change)
-    CIRRUS_SHELL: bashtask:
+    CIRRUS_SHELL: bash
+ 
+task:
   name: "Recovery Build"
   timeout_in: 120m
   container:
