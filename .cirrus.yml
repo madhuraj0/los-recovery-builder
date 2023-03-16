@@ -1,4 +1,28 @@
-task:
+env:
+    # Device
+    #DT_LINK: https://github.com/madhuraj0/device_oplus_RE879EL1
+    #DEVICE: RE879EL1
+    #OEM: oplus
+    #TARGET: bootimage
+    CIRRUS_ARTIFACT_NAME: los-recovery.img
+
+    #DT_PATH: device/$OEM/$DEVICE
+    #OUTPUT: boot.img
+
+    # Not Recommended to Change
+    USE_CCACHE: 1
+    CCACHE_SIZE: 50G
+    CCACHE_DIR: $HOME/work/.ccache
+    J_VAL: 16
+
+    # Cirrus Specific Vars (Do *NOT* Change)
+    CIRRUS_SHELL: bash
+
+    # Config
+    #CONFIG: config.sh
+
+    # Cirrus Specific Vars (Do *NOT* Change)
+    CIRRUS_SHELL: bashtask:
   name: "Recovery Build"
   timeout_in: 120m
   container:
@@ -6,8 +30,6 @@ task:
       cpu: 8
       memory: 23G
     build:
-      env:
-        CIRRUS_ARTIFACT_NAME: los-recovery.img
       steps:
         - run: |
             curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
