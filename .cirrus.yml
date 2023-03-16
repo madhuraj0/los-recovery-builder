@@ -1,20 +1,5 @@
 android:
   image: ubuntu:latest
-  packages:
-    - bc
-    - bison
-    - build-essential
-    - curl
-    - flex
-    - g++
-    - gcc
-    - git
-    - libssl-dev
-    - libxml2-utils
-    - make
-    - python
-    - unzip
-    - xmlstarlet
   tasks:
     build:
       env:
