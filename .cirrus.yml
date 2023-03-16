@@ -1,42 +1,38 @@
-env:
-    # Device
-    #DT_LINK: https://github.com/madhuraj0/device_oplus_RE879EL1
-    #DEVICE: RE879EL1
-    #OEM: oplus
-    #TARGET: bootimage
-    CIRRUS_ARTIFACT_NAME: los-recovery.img
-
-    #DT_PATH: device/$OEM/$DEVICE
-    #OUTPUT: boot.img
-
-    # Not Recommended to Change
-    USE_CCACHE: 1
-    CCACHE_SIZE: 50G
-    CCACHE_DIR: $HOME/work/.ccache
-    J_VAL: 16
-
-    # Cirrus Specific Vars (Do *NOT* Change)
-    CIRRUS_SHELL: bash
-
-    # Config
-    #CONFIG: config.sh
-
-    # Cirrus Specific Vars (Do *NOT* Change)
-    CIRRUS_SHELL: bash
- 
-task:
-  name: "Recovery Build"
-  timeout_in: 120m
-  container:
-      image: ghcr.io/alone0316/docker:arch
-      cpu: 8
-      memory: 23G
+android:
+  image: ubuntu:latest
+  packages:
+    - bc
+    - bison
+    - build-essential
+    - curl
+    - flex
+    - g++
+    - gcc
+    - git
+    - libssl-dev
+    - libxml2-utils
+    - make
+    - python
+    - unzip
+    - xmlstarlet
+  tasks:
     build:
+      env:
+        CIRRUS_ARTIFACT_NAME: los-recovery.img
       steps:
         - run: |
             curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
             chmod a+x ~/bin/repo
             export PATH=~/bin:$PATH
-        - run: ./sync-repo.sh
-        - run: ./build-image.sh
-        - run: ./upload-artifact.sh
+        - run: repo init -u git://github.com/LineageOS/android.git -b lineage-20.0
+        - run: repo sync -j$(nproc --all) --force-sync
+        - run: source build/envsetup.sh
+        - run: lunch lineage_RE879EL1-userdebug
+        - run: mka bootimage
+        - run: |
+            echo "Uploading recovery image..."
+            curl -X POST \
+              -H "Authorization: Bearer $CIRRUS_API_TOKEN" \
+              -H "Content-Type: application/octet-stream" \
+              --data-binary "@out/target/product/RE879EL1/boot.img" \
+              "https://api.cirrus-ci.com/v1/artifact/build/$CIRRUS_ARTIFACT_NAME"
